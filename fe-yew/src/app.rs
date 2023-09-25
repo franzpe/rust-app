@@ -26,15 +26,7 @@ pub fn app() -> Html {
 
     html! {
         <main>
-            <img class="logo" src="https://yew.rs/img/logo.png" alt="Yew logo" />
-            <h2 class="text-red-500">{ "HMR PLEASE !!!" }</h2>
-            <h1>{ "Hello World!" }</h1>
             <span>{"Counter: "} {*counter}</span>
-            <span class="subtitle">{ "from Yew with " }<i class="heart" /></span>
-            <TestComponent>
-                <h1>{ "Hello World!" }</h1>
-                <h1>{ "Hello World!" }</h1>
-            </TestComponent>
             <button {onclick}>{ " My Btn "}</button>
         </main>
     }
