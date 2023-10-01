@@ -1,7 +1,8 @@
 #![no_std]
 
 use soroban_sdk::{
-    contract, contracterror, contractimpl, contracttype, symbol_short, vec, Env, Symbol, Vec,
+    contract, contracterror, contractimpl, contracttype, symbol_short, vec, Address, Env, Symbol,
+    Vec,
 };
 
 #[contracterror]
@@ -13,6 +14,11 @@ pub enum Error {
 
 pub const COUNTER: Symbol = symbol_short!("COUNTER");
 pub const PEOPLE: Symbol = symbol_short!("PERSON");
+
+#[contracttype]
+pub enum DataKey {
+    COUNTER(Address),
+}
 
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -65,6 +71,20 @@ impl Contract {
         env.events()
             .publish((COUNTER, symbol_short!("increase")), count);
         env.storage().instance().set(&COUNTER, &count);
+        count
+    }
+
+    pub fn increase_by_address(env: Env, address: Address, value: u32) -> u32 {
+        address.require_auth();
+
+        let key = DataKey::COUNTER(address.clone());
+
+        let mut count: u32 = env.storage().instance().get(&key).unwrap_or_default();
+
+        count = count.saturating_add(value);
+
+        env.storage().instance().set(&key, &count);
+
         count
     }
 
