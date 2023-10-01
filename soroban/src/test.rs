@@ -1,4 +1,4 @@
-use soroban_sdk::{symbol_short, testutils::Logs, Env};
+use soroban_sdk::{symbol_short, testutils::Events, testutils::Logs, vec, Env, IntoVal};
 
 use crate::{Contract, ContractClient};
 
@@ -26,6 +26,28 @@ fn increment() {
     assert_eq!(client.increase(), 1);
     assert_eq!(client.increase(), 2);
     assert_eq!(client.increase(), 3);
+
+    assert_eq!(
+        env.events().all(),
+        vec![
+            &env,
+            (
+                contract_id.clone(),
+                (symbol_short!("COUNTER"), symbol_short!("increase")).into_val(&env),
+                1u32.into_val(&env)
+            ),
+            (
+                contract_id.clone(),
+                (symbol_short!("COUNTER"), symbol_short!("increase")).into_val(&env),
+                2u32.into_val(&env)
+            ),
+            (
+                contract_id,
+                (symbol_short!("COUNTER"), symbol_short!("increase")).into_val(&env),
+                3u32.into_val(&env)
+            ),
+        ]
+    );
 }
 
 #[test]
@@ -49,6 +71,38 @@ fn decrement() {
     assert_eq!(client.increase(), 3);
     assert_eq!(client.decrease(), 2);
     assert_eq!(client.decrease(), 1);
+
+    assert_eq!(
+        env.events().all(),
+        vec![
+            &env,
+            (
+                contract_id.clone(),
+                (symbol_short!("COUNTER"), symbol_short!("increase")).into_val(&env),
+                1u32.into_val(&env)
+            ),
+            (
+                contract_id.clone(),
+                (symbol_short!("COUNTER"), symbol_short!("increase")).into_val(&env),
+                2u32.into_val(&env)
+            ),
+            (
+                contract_id.clone(),
+                (symbol_short!("COUNTER"), symbol_short!("increase")).into_val(&env),
+                3u32.into_val(&env)
+            ),
+            (
+                contract_id.clone(),
+                (symbol_short!("COUNTER"), symbol_short!("decrease")).into_val(&env),
+                2u32.into_val(&env)
+            ),
+            (
+                contract_id,
+                (symbol_short!("COUNTER"), symbol_short!("decrease")).into_val(&env),
+                0u32.into_val(&env)
+            ),
+        ]
+    );
 }
 
 #[test]

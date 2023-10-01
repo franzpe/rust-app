@@ -53,6 +53,8 @@ impl Contract {
     pub fn increase(env: Env) -> u32 {
         let mut count: u32 = env.storage().instance().get(&COUNTER).unwrap_or(0);
         count = count.saturating_add(1);
+        env.events()
+            .publish((COUNTER, symbol_short!("increase")), count);
         env.storage().instance().set(&COUNTER, &count);
         count
     }
@@ -67,6 +69,8 @@ impl Contract {
     pub fn decrease(env: Env) -> u32 {
         let mut count: u32 = env.storage().instance().get(&COUNTER).unwrap_or(0);
         count = count.saturating_sub(1);
+        env.events()
+            .publish((COUNTER, symbol_short!("decrease")), count);
         env.storage().instance().set(&COUNTER, &count);
         count
     }
