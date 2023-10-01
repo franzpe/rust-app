@@ -1,6 +1,21 @@
-use soroban_sdk::Env;
+use soroban_sdk::{symbol_short, testutils::Logs, Env};
 
 use crate::{Contract, ContractClient};
+
+extern crate std;
+
+#[test]
+fn increase_by_person() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, Contract);
+    let client = ContractClient::new(&env, &contract_id);
+
+    client.increase_by_person(&symbol_short!("Frank"));
+    client.increase_by_person(&symbol_short!("Frank"));
+
+    let logs = env.logs().all();
+    std::print!("{}", logs.join("\n"));
+}
 
 #[test]
 fn increment() {
