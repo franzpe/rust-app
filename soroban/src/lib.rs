@@ -1,6 +1,15 @@
 #![no_std]
 
-use soroban_sdk::{contract, contractimpl, contracttype, symbol_short, vec, Env, Symbol, Vec};
+use soroban_sdk::{
+    contract, contracterror, contractimpl, contracttype, symbol_short, vec, Env, Symbol, Vec,
+};
+
+#[contracterror]
+#[derive(Copy, Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
+#[repr(u32)]
+pub enum Error {
+    LimitReached = 1,
+}
 
 pub const COUNTER: Symbol = symbol_short!("COUNTER");
 pub const PEOPLE: Symbol = symbol_short!("PERSON");
@@ -57,6 +66,18 @@ impl Contract {
             .publish((COUNTER, symbol_short!("increase")), count);
         env.storage().instance().set(&COUNTER, &count);
         count
+    }
+
+    pub fn constrained_increase(env: Env) -> Result<u32, Error> {
+        let mut count: u32 = env.storage().instance().get(&COUNTER).unwrap_or(0);
+        count = count.saturating_add(1);
+
+        if count < 2 {
+            env.storage().instance().set(&COUNTER, &count);
+            Ok(count)
+        } else {
+            Err(Error::LimitReached)
+        }
     }
 
     pub fn increase_by(env: Env, by: u32) -> u32 {
